@@ -44,8 +44,8 @@ Scuppy는 IR 기반 운전자 모니터링 시스템 프로젝트입니다.
 - 실패 시 동작 방식
 
 이 프로젝트에서는 아래 두 접근을 구분합니다.
-- `end-to-end model`
-- `application pipeline`
+- `end-to-end model`: 입력에서 최종 상태 판별까지 하나의 모델 흐름으로 처리하는 접근
+- `application pipeline`: 입력, 전처리, 얼굴/시선 추정, 포즈 추정, fusion, alert 단계를 연결한 전체 시스템 흐름
 
 Claude는 새 구현이 어느 쪽인지 코드 경로, 문서, 커밋 메시지에서 가능한 한 명확히 드러내야 합니다.
 특히 얼굴 confidence를 활용한 fusion 또는 동적 제어 규칙은 코드와 문서에 함께 남기는 것을 권장합니다.

@@ -39,8 +39,8 @@ Scuppy는 IR 카메라 기반 운전자 모니터링 시스템(DMS) 캡스톤 �
 - `docs/`
 
 또한 아래 두 방향을 구분해 관리합니다.
-- `end-to-end model`
-- `application pipeline`
+- `end-to-end model`: 입력에서 최종 상태 판별까지 하나의 모델 흐름으로 처리하는 접근
+- `application pipeline`: 입력, 전처리, 얼굴/시선 추정, 포즈 추정, fusion, alert 단계를 연결한 전체 시스템 흐름
 
 새 코드와 실험은 가능한 경우 어느 범주인지 드러나게 작성합니다.
 
