@@ -1,0 +1,33 @@
+{
+  "best_epoch": 23,
+  "best_val_clip_f1": 0.7023406819575114,
+  "test_window_loss": 0.9373130002368326,
+  "test_window_acc": 0.7254092905630241,
+  "test_window_f1_macro": 0.7037504829811562,
+  "test_clip_acc": 0.7508183306055647,
+  "test_clip_f1_macro": 0.6295659170023356,
+  "num_classes": 15,
+  "labels": [
+    "driver_actions/change_gear",
+    "driver_actions/drinking",
+    "driver_actions/hair_and_makeup",
+    "driver_actions/phonecall_left",
+    "driver_actions/phonecall_right",
+    "driver_actions/radio",
+    "driver_actions/reach_backseat",
+    "driver_actions/reach_side",
+    "driver_actions/safe_drive",
+    "driver_actions/standstill_or_waiting",
+    "driver_actions/talking_to_passenger",
+    "driver_actions/texting_left",
+    "driver_actions/texting_right",
+    "gaze_on_road/not_looking_road",
+    "talking/talking"
+  ],
+  "n_train_clips": 11405,
+  "n_val_clips": 2444,
+  "n_test_clips": 2444,
+  "n_train_windows": 34731,
+  "n_val_windows": 7502,
+  "n_test_windows": 7513
+}

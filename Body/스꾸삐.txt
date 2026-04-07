@@ -1,0 +1,219 @@
+목적 : 저조도 상황에서 DMS 성능 개선일 경우
+ : 목적이 확실하나 추가적인 연구 개선점이 없다면 연구성과 확장성이 약함
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+저조도 환경에서 IR 기반 eye tracking과 pose estimation의 task-level 신뢰도를 활용한 강건한 운전자 모니터링 시스템 설계
+
+문제: 저조도에서 DMS 성능 저하
+
+원인: IR 단일 관측의 불확실성
+
+해결: task-level 상호보완 + 신뢰도 기반 fusion
+
+확장성 : IR 단일 관측의 불확실성을 해결하기 위한 task-level 신뢰도 기반 융합 구조는 다양한 센서 환경 및 멀티모달 시스템으로 확장 가능하다.
+
+-----------------------------------------
+신뢰도
+
+신뢰도 = 해당 branch가 지금 “망가졌는지 아닌지” 판단하는 값
+
+IR frame
+→ eye branch → gaze + eye_conf
+→ pose branch → pose + pose_conf
+→ confidence-aware fusion
+→ behavior classification
+
+Pose 신뢰도 (핵심)
+ - 얼굴 잘 검출되는가 (landmark score)
+ - 프레임 간 값이 안정적인가 (temporal)
+ - 얼굴이 충분히 보이는가 (visibility)
+ - 움직임 추정이 강건하게 되는가 (pose prediction confidence (softmax))
+
+Eye 신뢰도
+ - 눈이 보이냐 (visibility)
+ - pose랑 말이 맞냐 (일관성)
+
+α = (1 - C_pose) * C_eye
+final = pose + α * eye
+
+수식 정교화 : $$Final\_Feature = \frac{w_1(C_{eye}) \cdot Eye + w_2(C_{pose}) \cdot Pose}{w_1 + w_2}$$
+--------------------------------------------
+사용 데이터셋
+IR 운전자 데이터셋 필요 (IR, NIR 포함, 운전자 얼굴, 저조도 + 차량 상황, occlusion / 안경 / 반사)
+단, 없을 가능성이 높음
+
+이 경우
+1. 일반 face / gaze / head pose 데이터셋 (RGB도 가능)
+ - eye branch와 pose branch 등을 사전 학습
+ - Backbone 학습 용도 
+예시) mpiigaze dataset, GazeCapture, 300W-LP, 
+
+2. IR 기반 보정 (가능한 IR 데이터 활용) IR Face, IR Pose 등
+ - IR 이미지에서 feature이 어떻게 달라지는지 적응
+ - 눈 영역 concat / 반사 / 노이즈 대응 / gaze direction 추정
+ - pose estimation IR 환경 튜닝
+ - fine-tuning / feature adaptation / 일부 layer만 학습
+ - 도메인 적응 필요 ! (가장 어렵고 중요한 단계)
+예시) CASIA NIR-VIS 2.0, FLIR ADAS Dataset 등 
+
+3. Failure Case 직접 촬영 
+ - eye only / pose only / naive fusion 등 비교실험을 위한 데이터 셋
+ - 저조도 / 선글라스, 안경 / 눈 가림 / 고개 회전 등 
+
+4. 일반적인 DMS 학습 데이터셋
+ - eye tracking, pose 기반 행동분류 모델을 학습
+ - 시간축을 기준으로 해당 행동이 이상 행동인지, 어떤 이상행동인지 판정
+예시) NTHU Driver Drowsiness Detection Dataset, DAD Dataset, State Farm Distracted Driver Detection Dataset, AIHub 운전자 이상행동 Dataset 등 
+
+--------------------------------------------
+학습 과정
+stage 1. 관측 브랜치 사전학습
+ - IR 입력에서 eye / pose를 안정적으로 뽑는 모델 확보
+ - 사용 데이터 : 일반 face / gaze / head pose 데이터셋 / IR 기반 데이터 (파인튜닝 용도)
+
+stage 2. 신뢰도 추정 및 융합 설계
+ - eye와 pose를 그냥 합치는 게 아니라, 어느 쪽을 더 믿을지 결정하는 구조 학습/설계
+ - eye confidence 계산
+ - pose confidence 계산
+ - confidence-aware fusion
+
+stage 3. DMS 분류기 학습
+ - eye/pose 출력 기반 행동 분류기 학습
+
+stage 4. 직접 촬영한 failure case 데이터로 비교실험 및 실제 검증
+
+## 행동 분류를 raw IR image에서 바로 end-to-end로 하려 들지 마라
+- 행동 분류는 얹는 형태
+- eye branch
+- pose branch
+- confidence-aware fusion
+이 핵심
+--------------------------------------------
+세부 과정 설계
+
+0. 카메라 / 입력 설정
+ - 입력 해상도: 640×480 또는 800×600
+ - 처리 해상도: 최종 모델 입력은 320×240 ~ 416×416
+ - FPS 목표: detector 15~20 FPS, 전체 파이프라인 10~15 FPS 이상
+
+0-2. IR 전처리
+ - grayscale 유지
+ - CLAHE 또는 가벼운 contrast normalization
+ - median blur 또는 bilateral light
+ - optional gamma correction
+ - normalize to [0,1]
+## 복잡한 연산은 하지 않는다. 
+
+0-3. ROI 정책
+ - 2단계 ROI 전략
+ - 첫 n 프레임 또는 tracking lost 시: 전체 frame에서 detect
+ - 이후: 이전 frame bbox 주변만 search
+
+Stage 1. IR 입력에서 eye / head pose / upper-body behavior cue를 안정적으로 뽑는 모듈 확보
+ - Face detector + tracker
+	YOLO 계열 경량 face detector 또는 RetinaFace-Mobile 계열
+	YOLOv8n / YOLOv11n 계열 face fine-tune
+	 - 빠르고 안정적이며 구현이 쉬움
+	 - 입력: 320×320 또는 416×416 IR frame
+	 - 출력: face bbox, detection score
+ 	 - detector는 매 프레임 돌리지 말고 3~5, 10프레임마다 1번
+ 	 - face bbox를 바로 자르지 말고 margin을 두어 판단
+
+ - Head pose branch
+	 - 경량 head pose CNN
+	 - MobileNetV3 기반 regression/classification head
+	 - 해당 얼굴 Pose를 기반으로 Eye Tracking 규칙 기반 예측
+
+ - Eye branch : IR face에서 시선 관련 단서 (이건 추가 정밀도 구현 시)
+	 - face bbox 기반 rule crop
+	 - rule-based eye crop + optional landmark correction
+	 - 일단은 Head Pose 기반으로 규칙 기반 예측을 수행하는 걸로 시도 : 더 빨라지고 경량화 됨 
+
+ - Skeleton / upper-body branch
+	 - upper-body crop : face bbox top부터 아래로 face height의 3.0~3.5배 등
+	 - YOLO-pose 계열 사용 : 빠르고 구현이 편리함
+추출할 핵심 feature
+	 - head–shoulder angle
+	 - shoulder symmetry
+	 - left/right wrist visibility
+	 - hand-to-face distance
+	 - hand-to-ear distance
+	 - elbow angle
+	 - upper-body lean
+	 - temporal motion magnitude
+
+Stage 2. 신뢰도 추정 및 융합 설계 : 
+각 branch가 지금 얼마나 믿을 만한지 판단하고, 그에 따라 최종 판단 가중치를 바꾸는 것
+	 - Rule-based weighted fusion : 쉽고 빠르나 동적으로 작동이 애매함
+	 - confidence-conditioned MLP fusion : 실험적으론 좋을 수 있으나, 무거워질 수 있음
+각 신뢰도는 휴리스틱 기반으로 각 입력값의 가중합으로 설정하거나 Softmax의 확률적 확신 정도로 결정
+
+Stage 3. DMS 분류기 학습
+	 - 시계열 단위의 입력 프레임
+
+ - 입력 feature 구성
+	 - pose output
+	 - skeleton output
+	 - confidences
+	 - fused feature
+
+Temporal Conv1D 또는 작은 GRU 또는 TCN
+을 기반으로 빠르면서 시계열적 처리가 가능하게 설정
+ : 기본적으로 이상행동은 몇 초간의 지속성을 기반으로 나타나기 때문에 시계열적 모델 필요
+
+Stage 4. 직접 촬영한 failure case 비교실험 및 검증
+ - failure case에서 안 죽는 걸 보여주는 게 더 중요
+	 - 촬영 환경 구성하여 실제 라벨링
+	 - clip-level 라벨 / 이벤트 start/end annotation
+
+ - 평가 포인트
+	 - branch failure 시 성능 유지
+	 - low-light degradation 완화
+	 - false positive 감소
+	 - false negative 감소
+	 - confidence calibration 개선
+	 - 처리 속도(FPS)
+--------------------------------------------
+필수 : 실험 검증, 실제 시연
+
+실험 검증
+ - Eye only
+ - Pose only
+ - 단순 결합(예: 평균, concat, 고정 가중치)
+ - 제안 방식(task-level 신뢰도 기반 융합)
+
+저조도 상황
+ - 정상 조명 vs 저조도
+ - 저조도 + 안경/반사
+ - 저조도 + 시선 일부 차폐
+
+시연 목적
+ - 저조도 차량 유사 환경에서 시스템이 작동하는지 확인
+ - eye branch가 약해질 때 pose branch가 보완하는지 관찰
+ - 신뢰도 기반 융합이 단일 브랜치보다 안정적인지 확인
+
+시연 시나리오 예시
+ - 정상 조명에서 전방 주시
+ - 조명을 낮춘 상태에서 전방 주시
+ - 저조도 + 안경 착용
+ - 저조도 + 손으로 눈 일부 가리기
+ - 저조도 + 고개 회전
+
+---------------------------------------
+평가 지표
+
+task level
+ - eye tracking 정확도 또는 gaze direction classification accuracy
+ - pose estimation error 또는 pose classification accuracy
+
+최종 DMS 판단 level
+ - distraction / drowsiness / attention state 분류 정확도
+ - precision / recall / F1
+ - false positive rate
+ - false negative rate
+
+신뢰도 관련
+ - low-confidence 상황에서의 오판 감소
+ - branch failure 상황에서의 성능 유지
+ - calibration 관련 지표

@@ -1,0 +1,16 @@
+﻿,driver_actions/change_gear,driver_actions/drinking,driver_actions/hair_and_makeup,driver_actions/phonecall_left,driver_actions/phonecall_right,driver_actions/radio,driver_actions/reach_backseat,driver_actions/reach_side,driver_actions/safe_drive,driver_actions/standstill_or_waiting,driver_actions/talking_to_passenger,driver_actions/texting_left,driver_actions/texting_right,gaze_on_road/not_looking_road,talking/talking
+driver_actions/change_gear,66,0,0,0,0,0,0,1,5,0,0,0,0,1,1
+driver_actions/drinking,0,198,18,3,6,0,0,1,1,0,0,1,7,2,2
+driver_actions/hair_and_makeup,0,3,235,4,8,0,0,4,2,0,0,1,1,37,9
+driver_actions/phonecall_left,0,2,0,519,11,0,0,0,20,0,1,3,0,3,247
+driver_actions/phonecall_right,2,11,11,1,847,0,0,0,15,0,0,2,7,7,117
+driver_actions/radio,1,0,0,0,0,168,0,1,3,0,0,0,0,7,2
+driver_actions/reach_backseat,0,0,0,0,0,0,53,3,0,0,0,0,0,0,1
+driver_actions/reach_side,0,1,1,2,1,0,1,657,5,0,0,2,4,27,6
+driver_actions/safe_drive,11,0,2,8,4,3,0,1,1109,0,1,14,8,7,76
+driver_actions/standstill_or_waiting,0,0,0,0,0,0,0,0,2,1,0,0,0,1,1
+driver_actions/talking_to_passenger,0,0,0,0,0,0,0,0,1,0,87,0,0,10,11
+driver_actions/texting_left,0,0,0,2,0,1,0,0,55,0,2,294,0,31,9
+driver_actions/texting_right,2,2,0,0,1,0,0,9,34,0,0,0,342,30,7
+gaze_on_road/not_looking_road,17,2,63,5,2,23,8,27,20,0,78,68,72,602,43
+talking/talking,8,0,9,101,163,7,1,15,67,0,42,3,6,56,426
