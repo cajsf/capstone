@@ -1,0 +1,17 @@
+{
+  "driver_actions/change_gear": 0,
+  "driver_actions/drinking": 1,
+  "driver_actions/hair_and_makeup": 2,
+  "driver_actions/phonecall_left": 3,
+  "driver_actions/phonecall_right": 4,
+  "driver_actions/radio": 5,
+  "driver_actions/reach_backseat": 6,
+  "driver_actions/reach_side": 7,
+  "driver_actions/safe_drive": 8,
+  "driver_actions/standstill_or_waiting": 9,
+  "driver_actions/talking_to_passenger": 10,
+  "driver_actions/texting_left": 11,
+  "driver_actions/texting_right": 12,
+  "gaze_on_road/not_looking_road": 13,
+  "talking/talking": 14
+}
