@@ -21,8 +21,8 @@ from sklearn.model_selection import train_test_split
 # =========================================================
 SEED = 42
 
-DATA_ROOT = r"C:\Users\hyi8402\Downloads\dmd_2"
-SAVE_ROOT = r"C:\Users\hyi8402\Desktop\Capstone\Code\3.result\tgcn_tsam_singleview_window_v2"
+DATA_ROOT = r"C:\Users\hyi8402\Desktop\Capstone\Body\Step_2_IR_Skeleton_Extract\dmd_finetune"
+SAVE_ROOT = r"C:\Users\hyi8402\Desktop\Capstone\Body\Step_3_IR_Skeleton_dmd_train"
 
 USE_LABEL_KEY = "primary_label"
 

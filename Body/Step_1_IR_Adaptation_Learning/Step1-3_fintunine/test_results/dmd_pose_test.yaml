@@ -1,0 +1,10 @@
+path: C:/Users/hyi8402/Desktop/dmd_labeling/dmd_split
+train: C:/Users/hyi8402/Desktop/dmd_labeling/dmd_split/test/images
+val: C:/Users/hyi8402/Desktop/dmd_labeling/dmd_split/test/images
+test: C:/Users/hyi8402/Desktop/dmd_labeling/dmd_split/test/images
+
+kpt_shape: [17, 3]
+flip_idx: [0, 2, 1, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15]
+
+names:
+  0: person

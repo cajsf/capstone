@@ -1,0 +1,27 @@
+path: C:\Users\hyi8402\Desktop\Capstone\Body\Step_1_IR_Adaptation_Learning\1.Dataset\OpenThermalPose
+train: train/images
+val: val/images
+test: test/images
+kpt_shape:
+- 17
+- 3
+flip_idx:
+- 0
+- 2
+- 1
+- 4
+- 3
+- 6
+- 5
+- 8
+- 7
+- 10
+- 9
+- 12
+- 11
+- 14
+- 13
+- 16
+- 15
+names:
+  0: person

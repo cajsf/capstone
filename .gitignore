@@ -1,4 +1,9 @@
 .DS_Store
 Body/record/
-Body/Dataset/
-Body/Code/3.result/record
+Body/Step_1_IR_Adaptation_Learning/Dataset/
+Body/Step_1_IR_Adaptation_LearningStep_1_IR_Adaptation_Learning
+Body/Step_2_IR_Skeleton_Extract/dmd
+Body/Step_2_IR_Skeleton_Extract/dmd_2
+Body/Step_2_IR_Skeleton_Extract/dmd_finetune
+Body/Step_2_IR_Skeleton_Extract/dmd_pretrained_yolopose
+Body/Step_3_IR_Skeleton_dmd_train/result
